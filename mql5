@@ -1,0 +1,109 @@
+mql5
+// +------------------------------------------------------------------+
+// |                                                 Miracle Scalper |
+// |                                      https://forexroboteasy.com |
+// |                                               Forex Robot Easy |
+// +------------------------------------------------------------------+
+
+// Global variables
+double StopLoss = 100; // Stop-loss level in points
+double TakeProfit = 200; // Take-profit level in points
+int MaxTrades = 5; // Maximum number of trades to open simultaneously
+bool IsBullish; // Flag to determine the direction of price movement
+
+//+------------------------------------------------------------------+
+//| Custom indicator functions                                        |
+//+------------------------------------------------------------------+
+// Function to determine the current market trend
+bool DetermineTrend()
+{
+    // Add your logic to determine the trend based on price movement
+    // Return true for bullish trend and false for bearish trend
+}
+
+// Function to calculate the entry price for a trade
+double CalculateEntryPrice()
+{
+    // Add your logic to calculate the entry price based on price action breakout and dynamic grid system
+    // Return the calculated entry price
+}
+
+//+------------------------------------------------------------------+
+//| Trading functions                                                |
+//+------------------------------------------------------------------+
+// Function to open a trade
+bool OpenTrade(double entryPrice, ENUM_ORDER_TYPE orderType)
+{
+    // Add your logic to open a trade with the specified entry price and order type
+    // Return true if the trade is successfully opened, false otherwise
+}
+
+// Function to close a trade
+bool CloseTrade(int ticket)
+{
+    // Add your logic to close the trade with the specified ticket number
+    // Return true if the trade is successfully closed, false otherwise
+}
+
+//+------------------------------------------------------------------+
+//| Expert advisor start function                                     |
+//+------------------------------------------------------------------+
+void OnTick()
+{
+    // Check if there are already maximum number of trades open
+    int openTrades = OrdersTotal();
+    if (openTrades >= MaxTrades)
+    {
+        return; // Exit the function if maximum trades are already open
+    }
+    
+    // Determine the current trend
+    IsBullish = DetermineTrend();
+    
+    // Calculate the entry price
+    double entryPrice = CalculateEntryPrice();
+    
+    // Open trades with the trend, regardless of the price direction
+    if (IsBullish)
+    {
+        OpenTrade(entryPrice, ORDER_TYPE_BUY);
+    }
+    else
+    {
+        OpenTrade(entryPrice, ORDER_TYPE_SELL);
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Expert advisor initialization function                            |
+//+------------------------------------------------------------------+
+void OnInit()
+{
+    // Set stop-loss and take-profit levels for all trades
+    for (int i = 0; i < MaxTrades; i++)
+    {
+        if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
+        {
+            break; // Exit the loop if there are no more open trades
+        }
+        
+        OrderModify(OrderTicket(), OrderOpenPrice(), StopLoss, TakeProfit, 0);
+    }
+}
+
+//+------------------------------------------------------------------+
+//| Expert advisor deinitialization function                          |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+{
+    // Close all open trades
+    for (int i = OrdersTotal() - 1; i >= 0; i--)
+    {
+        if (!OrderSelect(i, SELECT_BY_POS, MODE_TRADES))
+        {
+            break; // Exit the loop if there are no more open trades
+        }
+        
+        CloseTrade(OrderTicket());
+    }
+}
